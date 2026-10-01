@@ -66,7 +66,7 @@
     <div class="card">
       <p>Standing on a glass floor over the Grand Canyon, you <b>believe</b> the glass will hold you. Your legs are not so sure. The philosopher Tamar Gendler called that gut-level conviction an <b>alief</b>: something you hold to be true in your reflexes that you deny in your reasoning.</p>
       <p>Most of us now have an alief about AI. This audit measures two things: what you <b>believe</b> about AI, and how you <b>treat</b> it. Then it shows you where the two meet, and where they don't.</p>
-      <p class="small">14 questions. About two minutes. No login. Nothing you answer leaves your browser unless you choose, at the end, to add your anonymous result to the author's tally.</p>
+      <p class="small" id="introPrivacy">14 questions. About two minutes. No login. Nothing you answer leaves your browser.</p>
       <div class="row"><button class="btn" id="start">Start the audit</button></div>
     </div>
     <p class="small" style="margin-top:18px">A companion to the article <a id="articleLink" href="#">AI Consciousness: The Alief Thesis</a> by Ed Daniels.</p>
@@ -128,9 +128,9 @@
 
       <div class="optin hidden" id="optin">
         <h2 style="margin-top:0">Add your result to the tally?</h2>
-        <p>The author is collecting anonymous results to see where readers land. If you agree, this page sends <b>your two scores, your quadrant, and your 14 multiple-choice answers</b>, with today's date. It sends no name (not even the one on your card), no email, and nothing that identifies you or your device.</p>
+        <p>The author is collecting anonymous results to see where readers land, and plans to compile them and <b>publish the findings to the public</b>. If you agree, this page sends <b>your two scores, your quadrant, and your 14 multiple-choice answers</b>, with today's date. It sends no name (not even the one on your card), no email, and nothing that identifies you or your device.</p>
         <div class="row" style="margin-top:8px">
-          <button class="btn" id="submitBtn">Add my anonymous result</button>
+          <button class="btn" id="submitBtn">I agree to add my anonymous result</button>
         </div>
         <p class="small" id="submitMsg" style="margin-top:10px"></p>
       </div>
@@ -139,7 +139,7 @@
         <button class="btn ghost" id="again">Take it again</button>
       </div>
     </div>
-    <p class="small" style="margin-top:18px">This is a mirror, not a diagnosis. It is not a validated psychological test, and the scoring is one writer's judgment about which habits signal belief and which signal alief. Nothing is stored or sent anywhere unless you click "Add my anonymous result."</p>
+    <p class="small" style="margin-top:18px">This is a mirror, not a diagnosis. It is not a validated psychological test, and the scoring is one writer's judgment about which habits signal belief and which signal alief. <span id="footPrivacy">Nothing is stored or sent anywhere.</span></p>
   </section>
 
 </div>
@@ -147,7 +147,7 @@
 <script>
 // ---------- Settings ----------
 // Paste the Google Apps Script web app URL here (ends in /exec). Leave empty to hide the opt-in.
-const SUBMIT_URL = '';
+const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbwAHsl0LFLHZj___Herl05Umz_pquZ1McqkotAz0o9oc1F-3r1l2iAoP8ky5jGyOGY6/exec';
 const VERSION = 1;
 
 // ---------- Questions ----------
@@ -460,6 +460,12 @@ async function submitResult() {
     $('submitBtn').disabled = false;
     $('submitMsg').textContent = 'That did not go through. Please try again in a moment.';
   }
+}
+
+// ---------- Privacy wording follows whether collection is switched on ----------
+if (SUBMIT_URL) {
+  $('introPrivacy').textContent = '14 questions. About two minutes. No login. Nothing you answer leaves your browser unless, at the end, you agree to add your anonymous result to the author\'s published tally.';
+  $('footPrivacy').textContent = 'Nothing is stored or sent anywhere unless you click "I agree to add my anonymous result" above.';
 }
 
 // ---------- Wiring ----------
