@@ -50,6 +50,9 @@
   svg { width: 100%; height: auto; display: block; }
   .hidden { display: none; }
   a { color: var(--accent); }
+  .field { font: 700 1rem system-ui, -apple-system, "Segoe UI", Arial, sans-serif; width: 100%; max-width: 420px; padding: 12px 14px; border: 2px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); }
+  .preview { width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; margin-top: 14px; display: block; }
+  .optin { background: var(--accent-soft); border-radius: 12px; padding: 18px; margin-top: 8px; }
   @media (max-width: 520px) { html { font-size: 18px; } .card { padding: 18px; } .score { padding: 10px 6px; } .score b { font-size: 1.3rem; } }
 </style>
 </head>
@@ -63,7 +66,7 @@
     <div class="card">
       <p>Standing on a glass floor over the Grand Canyon, you <b>believe</b> the glass will hold you. Your legs are not so sure. The philosopher Tamar Gendler called that gut-level conviction an <b>alief</b>: something you hold to be true in your reflexes that you deny in your reasoning.</p>
       <p>Most of us now have an alief about AI. This audit measures two things: what you <b>believe</b> about AI, and how you <b>treat</b> it. Then it shows you where the two meet, and where they don't.</p>
-      <p class="small">14 questions. About two minutes. No login. Nothing you answer leaves your browser.</p>
+      <p class="small">14 questions. About two minutes. No login. Nothing you answer leaves your browser unless you choose, at the end, to add your anonymous result to the author's tally.</p>
       <div class="row"><button class="btn" id="start">Start the audit</button></div>
     </div>
     <p class="small" style="margin-top:18px">A companion to the article <a id="articleLink" href="#">AI Consciousness: The Alief Thesis</a> by Ed Daniels.</p>
@@ -109,18 +112,44 @@
       <h2>Your run report</h2>
       <p id="rrun"></p>
 
+      <h2>Your run report card</h2>
+      <p>A one-page card with your result, to paste into an email, print, or post.</p>
+      <label class="small" for="cardName">Name on the card (optional; it stays on your device)</label><br>
+      <input class="field" id="cardName" type="text" maxlength="40" placeholder="Anonymous" autocomplete="off">
+      <img class="preview" id="cardImg" alt="Your Alief Audit run report card">
+      <p class="small" style="margin-top:8px">On a phone, you can also press and hold the card to save it to your photos.</p>
       <div class="row">
-        <button class="btn" id="copy">Copy my result</button>
-        <button class="btn ghost" id="again">Take it again</button>
+        <button class="btn hidden" id="shCard">Share image</button>
+        <button class="btn" id="dlCard">Download image</button>
+        <button class="btn ghost" id="cpCard">Copy image</button>
+        <button class="btn ghost" id="copy">Copy text</button>
       </div>
       <p class="small" id="copied" style="margin-top:10px"></p>
+
+      <div class="optin hidden" id="optin">
+        <h2 style="margin-top:0">Add your result to the tally?</h2>
+        <p>The author is collecting anonymous results to see where readers land. If you agree, this page sends <b>your two scores, your quadrant, and your 14 multiple-choice answers</b>, with today's date. It sends no name (not even the one on your card), no email, and nothing that identifies you or your device.</p>
+        <div class="row" style="margin-top:8px">
+          <button class="btn" id="submitBtn">Add my anonymous result</button>
+        </div>
+        <p class="small" id="submitMsg" style="margin-top:10px"></p>
+      </div>
+
+      <div class="row">
+        <button class="btn ghost" id="again">Take it again</button>
+      </div>
     </div>
-    <p class="small" style="margin-top:18px">This is a mirror, not a diagnosis. It is not a validated psychological test, and the scoring is one writer's judgment about which habits signal belief and which signal alief. Nothing is stored or sent anywhere.</p>
+    <p class="small" style="margin-top:18px">This is a mirror, not a diagnosis. It is not a validated psychological test, and the scoring is one writer's judgment about which habits signal belief and which signal alief. Nothing is stored or sent anywhere unless you click "Add my anonymous result."</p>
   </section>
 
 </div>
 
 <script>
+// ---------- Settings ----------
+// Paste the Google Apps Script web app URL here (ends in /exec). Leave empty to hide the opt-in.
+const SUBMIT_URL = '';
+const VERSION = 1;
+
 // ---------- Questions ----------
 // axis: 'belief' (what you say you believe), 'treat' (how you treat it), 'run' (the run report, reported separately)
 const Q = [
@@ -308,16 +337,161 @@ function finish() {
   $('rgap').innerHTML = gapText(g);
   $('rtells').innerHTML = tells(ans).map(x => `<p class="tell">${x}</p>`).join('');
   $('rrun').innerHTML = RUN[s.run];
+  window._result = { s, t, g };
+  drawCard();
+  setupOptin();
   window._share = `My Alief Audit result: ${t}. Belief ${s.belief}, treatment ${s.treat}, gap ${(g > 0 ? '+' : '') + g}. Where do you land? ${location.href.split('#')[0]}`;
   $('copied').textContent = '';
   show('result');
 }
 
+// ---------- Run report card (PNG) ----------
+const RUN_SHORT = ['A&O x 3', 'Alert, but confused', 'Responds to voice only', 'Not a patient'];
+const QUAD_COLORS = { Alief:'#f3e3cf', Companion:'#efdcea', Skeptic:'#dde8f2', Colleague:'#dcecdf' };
+
+function drawCard() {
+  const { s, t, g } = window._result;
+  const W = 1200, H = 900, cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const c = cv.getContext('2d');
+  const SANS = 'Arial, Helvetica, sans-serif', MONO = '"Courier New", Courier, monospace';
+  const RED = '#b91c1c', INK = '#1d232b', MUTED = '#5b6470', LINE = '#9aa3ad';
+  const name = ($('cardName').value || '').trim() || 'Anonymous';
+  const today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+
+  c.fillStyle = '#fbf8f1'; c.fillRect(0, 0, W, H);
+  c.strokeStyle = RED; c.lineWidth = 6; c.strokeRect(20, 20, W - 40, H - 40);
+  // Header band
+  c.fillStyle = RED; c.fillRect(20, 20, W - 40, 92);
+  c.fillStyle = '#ffffff'; c.font = `700 40px ${SANS}`; c.textBaseline = 'middle';
+  c.fillText('RUN REPORT', 50, 66);
+  c.font = `700 24px ${SANS}`; c.textAlign = 'right';
+  c.fillText('THE ALIEF AUDIT  ·  AI CONSCIOUSNESS', W - 50, 66);
+  c.textAlign = 'left';
+
+  const label = (txt, x, y) => { c.fillStyle = MUTED; c.font = `700 18px ${SANS}`; c.textBaseline = 'alphabetic'; c.fillText(txt, x, y); };
+  const value = (txt, x, y, size = 34) => { c.fillStyle = INK; c.font = `700 ${size}px ${MONO}`; c.textBaseline = 'alphabetic'; c.fillText(txt, x, y); };
+  const box = (x, y, w, h) => { c.strokeStyle = LINE; c.lineWidth = 2; c.strokeRect(x, y, w, h); };
+
+  // Row 1: name and date
+  box(50, 135, 760, 92); label('PATIENT', 70, 165); value(name.slice(0, 32), 70, 208);
+  box(830, 135, 320, 92); label('DATE', 850, 165); value(today, 850, 208, 30);
+
+  // Row 2: assessment
+  box(50, 245, 1100, 128); label('ASSESSMENT', 70, 277);
+  c.fillStyle = RED; c.font = `700 64px ${SANS}`; c.fillText(t.toUpperCase(), 70, 350);
+
+  // Row 3: vitals
+  const vit = [['BELIEF', s.belief], ['TREATMENT', s.treat], ['GAP', (g > 0 ? '+' : '') + g]];
+  vit.forEach(([k, v], idx) => { const x = 50 + idx * 190; box(x, 391, 172, 112); label(k, x + 18, 421); value(String(v), x + 18, 482, 48); });
+  box(620, 391, 530, 112); label('MENTAL STATUS (YOUR GUT)', 640, 421); value(RUN_SHORT[s.run], 640, 480, 34);
+
+  // Row 4: mini map + narrative
+  const mx = 50, my = 525, ms = 300;
+  box(mx, my, ms + 40, ms + 50); label('POSITION', mx + 18, my + 28);
+  const px = mx + 20, py = my + 40, half = ms / 2;
+  [['Alief', 0, 0], ['Companion', 1, 0], ['Skeptic', 0, 1], ['Colleague', 1, 1]].forEach(([n, i, j]) => {
+    c.fillStyle = QUAD_COLORS[n]; c.fillRect(px + i * half, py + j * half, half, half);
+    c.fillStyle = INK; c.font = `700 ${n === t ? 24 : 20}px ${SANS}`; c.textAlign = 'center';
+    c.fillText(n, px + i * half + half / 2, py + j * half + (j === 0 ? 30 : half - 14)); c.textAlign = 'left';
+  });
+  c.strokeStyle = LINE; c.lineWidth = 2; c.strokeRect(px, py, ms, ms);
+  c.beginPath(); c.moveTo(px + half, py); c.lineTo(px + half, py + ms); c.moveTo(px, py + half); c.lineTo(px + ms, py + half); c.stroke();
+  const cl = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const dx = px + cl(s.belief, 5, 95) / 100 * ms, dy = py + ms - cl(s.treat, 14, 86) / 100 * ms;
+  c.fillStyle = RED; c.beginPath(); c.arc(dx, dy, 13, 0, Math.PI * 2); c.fill();
+  c.strokeStyle = '#ffffff'; c.lineWidth = 3; c.stroke();
+
+  box(410, my, 740, ms + 50); label('NARRATIVE', 430, my + 28);
+  const words = `Says ${s.belief < 50 ? 'AI is probably not conscious' : 'something may be going on inside AI'}, and treats it as ${s.treat < 50 ? 'a tool' : 'a someone'}. ` + gapPlain(g);
+  wrapText(c, words, 430, my + 78, 700, 38, `700 28px ${MONO}`, INK);
+  c.fillStyle = MUTED; c.font = `700 20px ${SANS}`;
+  c.fillText('Where do you land? Take the two-minute audit:', 430, my + 290);
+  c.fillStyle = RED; c.font = `700 22px ${SANS}`;
+  c.fillText(shortUrl(), 430, my + 322);
+
+  cv.toBlob(b => { window._cardBlob = b; }, 'image/png');
+  $('cardImg').src = cv.toDataURL('image/png');
+}
+
+function gapPlain(g) {
+  if (g >= 20) return `Treats it as more of a someone than they believe it is (gap +${g}). Classic alief.`;
+  if (g <= -20) return `Believes more is there than their behavior shows (gap ${g}). Keeps a professional distance.`;
+  return `Belief and behavior roughly agree (gap ${(g > 0 ? '+' : '') + g}).`;
+}
+function shortUrl() { const u = location.href.split('#')[0].split('?')[0]; return u.startsWith('http') ? u.replace(/^https?:\/\//, '') : 'the Alief Audit (link in the article)'; }
+function wrapText(c, text, x, y, maxW, lh, font, color) {
+  c.font = font; c.fillStyle = color; c.textBaseline = 'alphabetic';
+  let line = '';
+  for (const w of text.split(' ')) {
+    const test = line ? line + ' ' + w : w;
+    if (c.measureText(test).width > maxW && line) { c.fillText(line, x, y); line = w; y += lh; } else line = test;
+  }
+  if (line) c.fillText(line, x, y);
+}
+
+// ---------- Opt-in submission ----------
+function alreadySent() { try { return localStorage.getItem('aliefAuditSent') === '1'; } catch { return false; } }
+function markSent() { try { localStorage.setItem('aliefAuditSent', '1'); } catch {} }
+
+function setupOptin() {
+  if (!SUBMIT_URL) { $('optin').classList.add('hidden'); return; }
+  $('optin').classList.remove('hidden');
+  const sent = alreadySent();
+  $('submitBtn').disabled = sent;
+  $('submitMsg').textContent = sent ? 'Thanks. A result from this browser is already in the tally.' : '';
+}
+
+async function submitResult() {
+  const { s, t, g } = window._result;
+  const answers = {};
+  Q.forEach(q => { answers[q.id] = ans[q.id]; });
+  const payload = { v: VERSION, belief: s.belief, treat: s.treat, gap: g, quadrant: t, answers };
+  $('submitBtn').disabled = true;
+  $('submitMsg').textContent = 'Sending…';
+  try {
+    // text/plain keeps this a "simple" request, which Google Apps Script accepts without a CORS preflight.
+    const r = await fetch(SUBMIT_URL, { method: 'POST', body: JSON.stringify(payload) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || 'rejected');
+    markSent();
+    $('submitMsg').textContent = 'Added. Thank you for being part of the count.';
+  } catch (e) {
+    $('submitBtn').disabled = false;
+    $('submitMsg').textContent = 'That did not go through. Please try again in a moment.';
+  }
+}
+
 // ---------- Wiring ----------
+$('cardName').addEventListener('input', () => drawCard());
+$('dlCard').onclick = () => {
+  const a = document.createElement('a'); a.href = $('cardImg').src; a.download = 'alief-audit-run-report.png';
+  document.body.appendChild(a); a.click(); a.remove();
+};
+$('cpCard').onclick = async () => {
+  try {
+    const blob = window._cardBlob || await (await fetch($('cardImg').src)).blob();
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+    $('copied').textContent = 'Image copied. Paste it into an email or document.';
+  } catch { $('copied').textContent = 'Your browser would not copy the image. Use "Download image" instead.'; }
+};
+$('shCard').onclick = async () => {
+  try {
+    const blob = window._cardBlob || await (await fetch($('cardImg').src)).blob();
+    const file = new File([blob], 'alief-audit-run-report.png', { type: 'image/png' });
+    await navigator.share({ files: [file], title: 'My Alief Audit run report', text: window._share });
+  } catch (e) { if (e && e.name !== 'AbortError') $('copied').textContent = 'Sharing did not work here. Use "Download image" instead.'; }
+};
+// Phones and tablets that can share files get a Share button (opens Messages, email, WhatsApp, etc.).
+try {
+  const probe = new File([new Blob(['x'], { type: 'image/png' })], 'p.png', { type: 'image/png' });
+  if (navigator.canShare && navigator.canShare({ files: [probe] })) $('shCard').classList.remove('hidden');
+} catch {}
+$('submitBtn').onclick = submitResult;
 $('start').onclick = () => { i = 0; show('quiz'); render(); };
 $('next').onclick = () => { if (i < Q.length - 1) { i++; render(); } else finish(); };
 $('back').onclick = () => { if (i > 0) { i--; render(); } };
-$('again').onclick = () => { for (const k in ans) delete ans[k]; i = 0; show('intro'); };
+$('again').onclick = () => { for (const k in ans) delete ans[k]; i = 0; $('copied').textContent = ''; show('intro'); };
 $('copy').onclick = async () => {
   try { await navigator.clipboard.writeText(window._share); $('copied').textContent = 'Copied. Paste it anywhere.'; }
   catch { $('copied').textContent = window._share; }

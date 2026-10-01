@@ -12,17 +12,20 @@ Standing on a glass floor over the Grand Canyon, you *believe* the glass will ho
 - Produces two scores from 0 to 100, **Belief** and **Treatment**, plus the **gap** between them (Treatment minus Belief).
 - Places you on a four-quadrant map:
 
-|                               | Treats AI as a tool | Treats AI as a someone |
-|-------------------------------|---------------------|------------------------|
+|                                  | Treats AI as a tool | Treats AI as a someone |
+|----------------------------------|---------------------|------------------------|
 | **Believes it is not conscious** | Skeptic             | Alief                  |
 | **Believes it may be conscious** | Colleague           | Companion              |
 
-- Shows an interpretation of your quadrant and gap, up to three "tells" drawn from specific answers, and your run report verdict.
-- Marks where the article's author landed, for comparison.
+- Shows an interpretation of your quadrant and gap, up to three "tells" drawn from specific answers, and your run report verdict. The on-screen map also marks where the article's author landed, for comparison.
+- Makes a **run report card**: a one-page PNG with your result, an optional name, and only your own dot. You can download it, copy it, or (on phones and tablets) share it straight to Messages, email and other apps. It is designed for passing around and for group discussions.
+- Works on phones, tablets and computers.
 
 ## Privacy
 
-Everything runs in your browser. No login, no server, no cookies, no storage, no analytics. Nothing you answer leaves the page.
+Everything runs in your browser. No login, no cookies, no analytics. The name on the card never leaves your device.
+
+At the end, respondents may choose to **"Add my anonymous result"** to the author's tally. Only if they click it does the page send their two scores, quadrant, and 14 multiple-choice answers, plus the date. It sends no name, no email, and nothing that identifies the person or device. Google Apps Script does not expose visitors' IP addresses to the script. The browser remembers that it has already submitted, to discourage duplicates.
 
 ## Scoring
 
@@ -30,10 +33,31 @@ Each answer carries a value from 0 to 100. Belief is the average of Part 1 (the 
 
 This is a mirror, not a diagnosis. It is not a validated psychological instrument. The scoring reflects one writer's judgment about which habits signal belief and which signal alief.
 
+## Files
+
+- `index.html`: the whole audit, in one file.
+- `Code.gs`: the Google Apps Script that receives opted-in results and writes them to a Google Sheet. It is **not** served by GitHub Pages; it is pasted into Google Apps Script (below). Keeping it in the repo lets anyone see exactly what is collected.
+
+## Setting up results collection (one time, about 10 minutes)
+
+1. In Google Drive, create a new Google Sheet, for example **Alief Audit Results**.
+2. In the sheet, open **Extensions → Apps Script**. Delete the sample code, paste in all of `Code.gs`, and click **Save**.
+3. Optional: choose the `setup` function in the toolbar and click **Run** to create the **Results** tab and header row now. Google will ask you to authorize the script; approve it. (The tab is also created automatically on the first submission.)
+4. Click **Deploy → New deployment**. Click the gear next to "Select type" and choose **Web app**. Set **Execute as: Me** and **Who has access: Anyone**. Click **Deploy** and authorize if asked.
+5. Copy the **Web app URL** (it ends in `/exec`).
+6. In `index.html`, find `const SUBMIT_URL = '';` near the top of the script and paste the URL between the quotes. Commit the change to GitHub.
+7. Test it: take the audit on the live site, click **Add my anonymous result**, and check that a row appears in the Results tab.
+
+Until `SUBMIT_URL` is filled in, the opt-in box stays hidden and the audit works exactly as before.
+
+**If you later edit `Code.gs`**, use **Deploy → Manage deployments → Edit → Version: New version** so the same URL keeps working. Creating a brand-new deployment gives a new URL, which you would then have to paste into `index.html` again.
+
+**Answer key:** the Results tab stores each answer as short text (for example "Always" or "Collaborator"), so it can be read and charted directly. If you change the questions in `index.html`, update the `KEY` list in `Code.gs` to match and bump `VERSION` in `index.html`.
+
 ## Deploy on GitHub Pages
 
-1. Create a public repository (for example `alief-audit`) and add `index.html` and this `README.md`.
-2. In the repository, go to **Settings → Pages**, set the source to the `main` branch and the root folder, and save.
+1. Create a public repository (for example `alief-audit`) and add `index.html`, `Code.gs` and this `README.md` at the top level.
+2. In the repository, go to **Settings → Pages**, set the source to *Deploy from a branch*, the `main` branch and `/ (root)`, and save.
 3. The audit will be live at `https://<your-username>.github.io/alief-audit/`.
 4. In `index.html`, set the `href` of the link with `id="articleLink"` to the published article URL.
 
