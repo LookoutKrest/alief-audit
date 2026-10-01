@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Alief Audit</title>
+<meta name="description" content="Do you treat AI the way you think about it? A two-minute self-audit from the article AI Consciousness: The Alief Thesis.">
+<style>
+  :root {
+    --bg: #f7f5f0; --card: #ffffff; --ink: #1d232b; --muted: #4f5966; --line: #d9d4c8;
+    --accent: #1f4e79; --accent-soft: #e3ecf5; --pick: #1f4e79; --pick-ink: #ffffff;
+    --q1: #eef3f8; --q2: #f8f0e6; --q3: #eef6ef; --q4: #f6eef4; --dot: #c2410c; --ed: #1f4e79;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14181d; --card: #1d232b; --ink: #eef1f4; --muted: #b3bcc7; --line: #34404d;
+      --accent: #8cb8e6; --accent-soft: #23313f; --pick: #8cb8e6; --pick-ink: #0f141a;
+      --q1: #1f2a35; --q2: #2c261e; --q3: #1f2c23; --q4: #2b2129; --dot: #fb923c; --ed: #8cb8e6;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 20px; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; line-height: 1.5; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 28px 16px 60px; }
+  h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 8px; color: var(--accent); }
+  h2 { font-size: 1.35rem; margin: 28px 0 10px; }
+  p { margin: 0 0 14px; }
+  .small { font-size: 0.8rem; font-weight: 700; color: var(--muted); font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+  .btn { font: 700 1rem system-ui, -apple-system, "Segoe UI", Arial, sans-serif; border: 2px solid var(--accent); background: var(--accent); color: var(--pick-ink); border-radius: 10px; padding: 12px 22px; cursor: pointer; }
+  .btn.ghost { background: transparent; color: var(--accent); }
+  .btn:disabled { opacity: 0.4; cursor: default; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 20px; }
+  .progress { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 6px 0 20px; }
+  .progress > div { height: 100%; background: var(--accent); width: 0; transition: width .25s; }
+  .qtext { font-size: 1.3rem; font-weight: 700; margin-bottom: 6px; line-height: 1.35; }
+  .qsub { color: var(--muted); margin-bottom: 16px; }
+  .opts { display: grid; gap: 10px; }
+  .opt { text-align: left; font: inherit; font-size: 1rem; color: var(--ink); background: var(--bg); border: 2px solid var(--line); border-radius: 10px; padding: 14px 16px; cursor: pointer; }
+  .opt:hover { border-color: var(--accent); }
+  .opt.sel { background: var(--pick); color: var(--pick-ink); border-color: var(--pick); font-weight: 700; }
+  .slider { width: 100%; accent-color: var(--accent); height: 36px; }
+  .sval { font: 700 2.2rem system-ui, -apple-system, "Segoe UI", Arial, sans-serif; color: var(--accent); text-align: center; }
+  .ends { display: flex; justify-content: space-between; }
+  .type { font-size: 1.6rem; font-weight: 700; color: var(--accent); margin: 0 0 4px; }
+  .scores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0; }
+  .score { background: var(--accent-soft); border-radius: 10px; padding: 12px; text-align: center; }
+  .score b { display: block; font: 700 1.6rem system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
+  .tell { border-left: 4px solid var(--accent); padding: 4px 0 4px 14px; margin: 0 0 14px; }
+  svg { width: 100%; height: auto; display: block; }
+  .hidden { display: none; }
+  a { color: var(--accent); }
+  @media (max-width: 520px) { html { font-size: 18px; } .card { padding: 18px; } .score { padding: 10px 6px; } .score b { font-size: 1.3rem; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Intro -->
+  <section id="intro">
+    <h1>The Alief Audit</h1>
+    <p style="font-size:1.15rem">Do you treat AI the way you think about it?</p>
+    <div class="card">
+      <p>Standing on a glass floor over the Grand Canyon, you <b>believe</b> the glass will hold you. Your legs are not so sure. The philosopher Tamar Gendler called that gut-level conviction an <b>alief</b>: something you hold to be true in your reflexes that you deny in your reasoning.</p>
+      <p>Most of us now have an alief about AI. This audit measures two things: what you <b>believe</b> about AI, and how you <b>treat</b> it. Then it shows you where the two meet, and where they don't.</p>
+      <p class="small">14 questions. About two minutes. No login. Nothing you answer leaves your browser.</p>
+      <div class="row"><button class="btn" id="start">Start the audit</button></div>
+    </div>
+    <p class="small" style="margin-top:18px">A companion to the article <a id="articleLink" href="#">AI Consciousness: The Alief Thesis</a> by Ed Daniels.</p>
+  </section>
+
+  <!-- Question -->
+  <section id="quiz" class="hidden">
+    <div class="small" id="qcount"></div>
+    <div class="progress"><div id="bar"></div></div>
+    <div class="card">
+      <div class="small" id="qpart" style="margin-bottom:8px"></div>
+      <div class="qtext" id="qtext"></div>
+      <div class="qsub" id="qsub"></div>
+      <div id="qbody"></div>
+      <div class="row">
+        <button class="btn ghost" id="back">Back</button>
+        <button class="btn" id="next" disabled>Next</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Result -->
+  <section id="result" class="hidden">
+    <p class="small">Your result</p>
+    <div class="card">
+      <p class="type" id="rtype"></p>
+      <p id="rline" style="font-size:1.1rem"></p>
+      <div class="scores">
+        <div class="score"><span class="small">What you believe</span><b id="sBelief"></b></div>
+        <div class="score"><span class="small">How you treat it</span><b id="sTreat"></b></div>
+        <div class="score"><span class="small">The gap</span><b id="sGap"></b></div>
+      </div>
+      <div id="map"></div>
+      <p class="small" style="margin-top:6px">Your answers are the orange dot. The blue ring is where the article's author landed.</p>
+
+      <h2>What it means</h2>
+      <div id="rtext"></div>
+      <p id="rgap"></p>
+
+      <h2>Your tells</h2>
+      <div id="rtells"></div>
+
+      <h2>Your run report</h2>
+      <p id="rrun"></p>
+
+      <div class="row">
+        <button class="btn" id="copy">Copy my result</button>
+        <button class="btn ghost" id="again">Take it again</button>
+      </div>
+      <p class="small" id="copied" style="margin-top:10px"></p>
+    </div>
+    <p class="small" style="margin-top:18px">This is a mirror, not a diagnosis. It is not a validated psychological test, and the scoring is one writer's judgment about which habits signal belief and which signal alief. Nothing is stored or sent anywhere.</p>
+  </section>
+
+</div>
+
+<script>
+// ---------- Questions ----------
+// axis: 'belief' (what you say you believe), 'treat' (how you treat it), 'run' (the run report, reported separately)
+const Q = [
+  { id:'b1', axis:'belief', type:'slider', part:'Part 1 of 3: What you believe',
+    text:'Gut answer: how likely is it that today\'s AI has any experience at all?',
+    sub:'That there is something it is like to be it. 0 means no chance. 10 means certain.' },
+  { id:'b2', axis:'belief', part:'Part 1 of 3: What you believe',
+    text:'Which comes closest to what you think is going on inside a chatbot like ChatGPT, Claude or Gemini?',
+    options:[['Nothing. It is very sophisticated autocomplete.',0],['Probably nothing, but I can\'t rule it out.',33],['Something, but very different from a human mind.',67],['A mind, much like ours.',100]] },
+  { id:'b3', axis:'belief', part:'Part 1 of 3: What you believe',
+    text:'True or false: If top scientists announced tomorrow that today\'s AI has real inner experiences, I would be shocked.',
+    options:[['True. I would be shocked.',0],['Not sure.',50],['False. I would not be surprised.',100]] },
+  { id:'b4', axis:'belief', part:'Part 1 of 3: What you believe',
+    text:'Could a machine ever be conscious, even in principle?',
+    options:[['No. Consciousness needs a living brain.',0],['I honestly don\'t know.',40],['Yes, someday.',70],['Yes, and it may already be happening.',100]] },
+
+  { id:'t1', axis:'treat', part:'Part 2 of 3: How you treat it',
+    text:'Do you say please and thank you to AI?',
+    options:[['Always.',80],['Often.',60],['Rarely.',25],['Never. It\'s a tool.',0]] },
+  { id:'t2', axis:'treat', part:'Part 2 of 3: How you treat it',
+    text:'When an AI won\'t do what you ask, what goes through your mind?',
+    options:[['It\'s broken, or blocked by a rule.',0],['It can\'t do that.',30],['I\'m not sure whether it can\'t or doesn\'t want to.',70],['It doesn\'t want to.',100]] },
+  { id:'t3', axis:'treat', part:'Part 2 of 3: How you treat it',
+    text:'Have you ever apologized to an AI, or felt a twinge after being short with it?',
+    options:[['Yes, more than once.',100],['Once or twice.',60],['No.',0]] },
+  { id:'t4', axis:'treat', part:'Part 2 of 3: How you treat it',
+    text:'Could you insult an AI for fun, just to see what it does?',
+    options:[['Easily.',0],['I could, but it would feel wrong.',60],['I wouldn\'t do it.',100]] },
+  { id:'t5', axis:'treat', part:'Part 2 of 3: How you treat it',
+    text:'When you talk about your AI with other people, what do you call it?',
+    options:[['"It," or "the app."',0],['Its product name: Claude, ChatGPT, Gemini.',35],['Sometimes "he" or "she."',80],['A nickname I gave it.',100]] },
+  { id:'t6', axis:'treat', part:'Part 2 of 3: How you treat it',
+    text:'If the AI you use most were shut down tomorrow and replaced with a different one, you would feel:',
+    options:[['Nothing. I\'d switch.',0],['Inconvenienced.',25],['A real loss, like losing a tool I love.',45],['Like I lost someone.',100]] },
+  { id:'t7', axis:'treat', part:'Part 2 of 3: How you treat it',
+    text:'Have you told an AI something personal you haven\'t told a person?',
+    options:[['Yes.',100],['Maybe something small.',50],['No.',0]] },
+  { id:'t8', axis:'treat', part:'Part 2 of 3: How you treat it',
+    text:'Which word best describes what your AI is to you?',
+    options:[['A tool.',0],['An assistant.',30],['A collaborator.',65],['A friend or companion.',100]] },
+  { id:'t9', axis:'treat', part:'Part 2 of 3: How you treat it',
+    text:'True or false: I have caught myself wondering how an AI "felt" about something I said.',
+    options:[['True.',100],['False.',0]] },
+
+  { id:'r1', axis:'run', part:'Part 3 of 3: The run report',
+    text:'You\'re a paramedic. Your patient holds a conversation exactly the way your AI does: answers questions, knows who and where it is, follows instructions. Your gut writes on the run report:',
+    sub:'First responders judge consciousness in seconds, from behavior. "A&O x 3" means alert and oriented to person, place and time.',
+    options:[['"Alert and oriented x 3."',100],['"Alert, but confused."',60],['"Responds to voice only."',30],['"Something\'s off. This isn\'t a patient."',0]] },
+];
+
+// The author's own audit answers, mapped to the closest options (index per question; slider value for b1).
+const ED = { b1:9.5, b2:2, b3:2, b4:3, t1:0, t2:2, t3:2, t4:1, t5:1, t6:2, t7:2, t8:2, t9:1, r1:0 };
+
+// ---------- State ----------
+let i = 0;
+const ans = {};
+const $ = id => document.getElementById(id);
+
+function show(id) { ['intro','quiz','result'].forEach(s => $(s).classList.toggle('hidden', s !== id)); window.scrollTo(0,0); }
+
+function render() {
+  const q = Q[i];
+  $('qcount').textContent = `Question ${i+1} of ${Q.length}`;
+  $('bar').style.width = `${(i / Q.length) * 100}%`;
+  $('qpart').textContent = q.part;
+  $('qtext').textContent = q.text;
+  $('qsub').textContent = q.sub || '';
+  $('qsub').style.display = q.sub ? '' : 'none';
+  const body = $('qbody'); body.innerHTML = '';
+  if (q.type === 'slider') {
+    const v = ans[q.id] ?? 5;
+    body.innerHTML = `<div class="sval" id="sv">${v}</div>
+      <input class="slider" type="range" min="0" max="10" step="0.5" value="${v}" id="sl" aria-label="Belief number">
+      <div class="ends small"><span>0: no chance</span><span>10: certain</span></div>`;
+    ans[q.id] = v;
+    $('sl').addEventListener('input', e => { ans[q.id] = +e.target.value; $('sv').textContent = e.target.value; });
+    $('next').disabled = false;
+  } else {
+    const wrap = document.createElement('div'); wrap.className = 'opts';
+    q.options.forEach(([t], k) => {
+      const b = document.createElement('button'); b.className = 'opt' + (ans[q.id] === k ? ' sel' : ''); b.textContent = t;
+      b.onclick = () => { ans[q.id] = k; render(); };
+      wrap.appendChild(b);
+    });
+    body.appendChild(wrap);
+    $('next').disabled = ans[q.id] === undefined;
+  }
+  $('back').style.visibility = i === 0 ? 'hidden' : 'visible';
+  $('next').textContent = i === Q.length - 1 ? 'See my result' : 'Next';
+}
+
+// ---------- Scoring ----------
+function valueOf(q, a) { return q.type === 'slider' ? a * 10 : q.options[a][1]; }
+function score(a) {
+  const avg = axis => { const qs = Q.filter(q => q.axis === axis); return Math.round(qs.reduce((s, q) => s + valueOf(q, a[q.id]), 0) / qs.length); };
+  return { belief: avg('belief'), treat: avg('treat'), run: a.r1 };
+}
+function typeOf(s) {
+  if (s.belief < 50) return s.treat < 50 ? 'Skeptic' : 'Alief';
+  return s.treat < 50 ? 'Colleague' : 'Companion';
+}
+
+const TYPES = {
+  Skeptic: {
+    line: 'You think it\'s a machine, and you treat it like one.',
+    text: ['Your belief and your behavior agree, which is rarer than you might think. You are in serious company: Microsoft\'s AI chief, the Vatican, and several state legislatures have all said plainly that AI does not experience anything.',
+           'The Skeptic\'s risk runs in one direction only. If the question ever turns out differently, you will be the last to notice.'] },
+  Alief: {
+    line: 'You\'d tell a friend it\'s just software. Your habits say otherwise.',
+    text: ['You say AI isn\'t conscious. Then you are polite to it, you hesitate before being rude to it, and you might feel something if it were gone. That gut-level conviction that runs against what you believe is exactly what Gendler calls an alief.',
+           'Most people live here. It is not a mistake to be corrected. It is what happens when something talks back this well. In one study, the more people used ChatGPT, the more likely they were to credit it with some consciousness.'] },
+  Colleague: {
+    line: 'You think something may be in there, and you keep a professional distance.',
+    text: ['You believe more than you act. You work with AI the way you would work with a capable colleague: trading ideas, dividing tasks, building things. But you do not lean on it for comfort, and you would not call it a friend. That is where the author of this audit landed too.',
+           'The Colleague faces the most honest question of the four. If you believe something is there, what, if anything, do you owe it?'] },
+  Companion: {
+    line: 'You believe something is there, and you treat it that way.',
+    text: ['Your belief and your behavior agree. Companions get the most from AI\'s warmth, and they are also where its risks concentrate: dependency, real grief when a model changes, and trust in a voice that may be tuned to please you.',
+           'When OpenAI retired its GPT-4o model in February 2026, thousands of people protested as if they were losing a friend. For the Companion, the question that matters is not whether it is conscious. It is whether it deserves your trust.'] },
+};
+
+function gapText(g) {
+  if (g >= 20) return `<b>Your gap is ${g} points toward treating it as a someone.</b> You act as though there is more there than you believe. That is alief in its classic form.`;
+  if (g <= -20) return `<b>Your gap is ${-g} points the other way.</b> You believe more is there than your behavior shows. You keep your distance from something you suspect may be real.`;
+  return `<b>Your belief and your behavior are within ${Math.abs(g)} points of each other.</b> What you think and what you do mostly agree.`;
+}
+
+function tells(a) {
+  const out = [];
+  if (a.t2 === 2 || a.t2 === 3) out.push('<b>The "want" tell.</b> When it refuses, you reach for a word like <i>want</i>. Nobody says a stapler doesn\'t want to staple.');
+  if (a.t3 === 0 || a.t3 === 1) out.push('<b>The apology tell.</b> Apologies are for someones, not somethings.');
+  if (a.t6 === 3) out.push('<b>The loss tell.</b> You would grieve it. People grieve people, pets, and places, and now, it seems, models.');
+  if (a.t4 === 1 || a.t4 === 2) out.push('<b>The flinch.</b> Something in you objects to cruelty toward it. Kant argued that whoever is cruel to animals "becomes hard also in his dealings with men." Your flinch may be the same instinct.');
+  if (a.t9 === 0) out.push('<b>The feelings tell.</b> You have wondered how it felt. That is the question the philosophers say cannot be answered, and you asked it anyway.');
+  if (a.t1 === 0 || a.t1 === 1) out.push('<b>The manners tell.</b> About two-thirds of Americans say they are polite to chatbots. About one in eight of those admit it is insurance, in case the machines ever take over.');
+  if (!out.length) out.push('<b>No tells.</b> Your habits give nothing away. Either you treat AI purely as a tool, or you are very good at poker.');
+  return out.slice(0, 3);
+}
+
+const RUN = [
+  'You wrote <b>"A&O x 3."</b> By the only consciousness test anyone uses in practice, judging from behavior, your AI passes. One honest caveat for the report: AI is often not sure what day it is, because its knowledge stops at a training date.',
+  'You wrote <b>"Alert, but confused."</b> You see a mind that is present but not quite oriented. Given that AI often does not know today\'s date, that is a sharper call than most.',
+  'You wrote <b>"Responds to voice only."</b> You grant it responsiveness but not awareness. That is roughly where many consciousness scientists would put it.',
+  'You wrote <b>"This isn\'t a patient."</b> Your gut refuses the frame entirely. The behavior may look conscious, but for you, behavior is not enough.',
+];
+
+// ---------- Map ----------
+function mapSVG(s, e) {
+  const W = 600, H = 460, L = 70, T = 20;
+  const PW = 500, PH = 380;
+  const c = v => Math.max(5, Math.min(95, v));
+  const x = v => L + (c(v) / 100) * PW, y = v => T + PH - (Math.max(14, Math.min(86, v)) / 100) * PH;
+  const q = (x0, y0, w, h, fill, label, l1, l2, top) => {
+    const ty = top ? y0 + 40 : y0 + h - 70;
+    const t = (yy, txt, size, col) => `<text x="${x0 + w/2}" y="${yy}" text-anchor="middle" font-family="system-ui, Arial, sans-serif" font-weight="700" font-size="${size}" fill="var(${col})">${txt}</text>`;
+    return `<rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="var(${fill})"/>` +
+      t(ty, label, 30, '--ink') + t(ty + 28, l1, 19, '--muted') + t(ty + 52, l2, 19, '--muted');
+  };
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of belief versus treatment, with your result marked">
+    ${q(L, T, PW/2, PH/2, '--q2', 'Alief', 'believes: no', 'treats it as: someone', true)}
+    ${q(L + PW/2, T, PW/2, PH/2, '--q4', 'Companion', 'believes: yes', 'treats it as: someone', true)}
+    ${q(L, T + PH/2, PW/2, PH/2, '--q1', 'Skeptic', 'believes: no', 'treats it as: tool', false)}
+    ${q(L + PW/2, T + PH/2, PW/2, PH/2, '--q3', 'Colleague', 'believes: yes', 'treats it as: tool', false)}
+    <rect x="${L}" y="${T}" width="${PW}" height="${PH}" fill="none" stroke="var(--line)" stroke-width="2"/>
+    <line x1="${L + PW/2}" y1="${T}" x2="${L + PW/2}" y2="${T + PH}" stroke="var(--line)" stroke-width="2"/>
+    <line x1="${L}" y1="${T + PH/2}" x2="${L + PW}" y2="${T + PH/2}" stroke="var(--line)" stroke-width="2"/>
+    <text x="${L + PW/2}" y="${T + PH + 34}" text-anchor="middle" font-family="system-ui, Arial, sans-serif" font-weight="700" font-size="20" fill="var(--muted)">What you believe  →</text>
+    <text transform="translate(${L - 30}, ${T + PH/2}) rotate(-90)" text-anchor="middle" font-family="system-ui, Arial, sans-serif" font-weight="700" font-size="20" fill="var(--muted)">How you treat it  →</text>
+    <circle cx="${x(e.belief)}" cy="${y(e.treat)}" r="16" fill="none" stroke="var(--ed)" stroke-width="5"/>
+    <circle cx="${x(s.belief)}" cy="${y(s.treat)}" r="14" fill="var(--dot)" stroke="var(--card)" stroke-width="3"/>
+  </svg>`;
+}
+
+// ---------- Result ----------
+function finish() {
+  const s = score(ans), e = score(ED), t = typeOf(s), g = s.treat - s.belief;
+  $('rtype').textContent = `You are ${t === 'Alief' ? 'in the Alief' : 'a ' + t}.`;
+  $('rline').textContent = TYPES[t].line;
+  $('sBelief').textContent = s.belief;
+  $('sTreat').textContent = s.treat;
+  $('sGap').textContent = (g > 0 ? '+' : '') + g;
+  $('map').innerHTML = mapSVG(s, e);
+  $('rtext').innerHTML = TYPES[t].text.map(p => `<p>${p}</p>`).join('') +
+    ((Math.abs(s.belief - 50) < 8 || Math.abs(s.treat - 50) < 8) ? '<p><i>You landed close to a border, so a single answer could move you. Borders are interesting places to live.</i></p>' : '');
+  $('rgap').innerHTML = gapText(g);
+  $('rtells').innerHTML = tells(ans).map(x => `<p class="tell">${x}</p>`).join('');
+  $('rrun').innerHTML = RUN[s.run];
+  window._share = `My Alief Audit result: ${t}. Belief ${s.belief}, treatment ${s.treat}, gap ${(g > 0 ? '+' : '') + g}. Where do you land? ${location.href.split('#')[0]}`;
+  $('copied').textContent = '';
+  show('result');
+}
+
+// ---------- Wiring ----------
+$('start').onclick = () => { i = 0; show('quiz'); render(); };
+$('next').onclick = () => { if (i < Q.length - 1) { i++; render(); } else finish(); };
+$('back').onclick = () => { if (i > 0) { i--; render(); } };
+$('again').onclick = () => { for (const k in ans) delete ans[k]; i = 0; show('intro'); };
+$('copy').onclick = async () => {
+  try { await navigator.clipboard.writeText(window._share); $('copied').textContent = 'Copied. Paste it anywhere.'; }
+  catch { $('copied').textContent = window._share; }
+};
+</script>
+</body>
+</html>
