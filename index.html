@@ -77,7 +77,6 @@
     <div class="small" id="qcount"></div>
     <div class="progress"><div id="bar"></div></div>
     <div class="card">
-      <div class="small" id="qpart" style="margin-bottom:8px"></div>
       <div class="qtext" id="qtext"></div>
       <div class="qsub" id="qsub"></div>
       <div id="qbody"></div>
@@ -147,61 +146,61 @@
 <script>
 // ---------- Settings ----------
 // Paste the Google Apps Script web app URL here (ends in /exec). Leave empty to hide the opt-in.
-const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbxBBKvebCVAuVcf10j9sP8sbCfWWP_fu6UnGhXY3U2M4XNbgeMiq7lLfbeQiJhuiT4W2Q/exec';
-const VERSION = 1;
+const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbwAHsl0LFLHZj___Herl05Umz_pquZ1McqkotAz0o9oc1F-3r1l2iAoP8ky5jGyOGY6/exec';
+const VERSION = 2; // 2 = Oct 3, 2026 wording (Q1 subtitle, Q3, run report)
 
 // ---------- Questions ----------
 // axis: 'belief' (what you say you believe), 'treat' (how you treat it), 'run' (the run report, reported separately)
 const Q = [
-  { id:'b1', axis:'belief', type:'slider', part:'Part 1 of 3: What you believe',
-    text:'Gut answer: how likely is it that today\'s AI has any experience at all?',
-    sub:'That there is something it is like to be it. 0 means no chance. 10 means certain.' },
-  { id:'b2', axis:'belief', part:'Part 1 of 3: What you believe',
+  { id:'b1', axis:'belief', type:'slider',
+    text:'Gut answer: how likely is it that today\'s AI is conscious?',
+    sub:'In other words, do you believe AI is conscious? 0 means no chance. 10 means certain.' },
+  { id:'b2', axis:'belief',
     text:'Which comes closest to what you think is going on inside a chatbot like ChatGPT, Claude or Gemini?',
     options:[['Nothing. It is very sophisticated autocomplete.',0],['Probably nothing, but I can\'t rule it out.',33],['Something, but very different from a human mind.',67],['A mind, much like ours.',100]] },
-  { id:'b3', axis:'belief', part:'Part 1 of 3: What you believe',
-    text:'True or false: If top scientists announced tomorrow that today\'s AI has real inner experiences, I would be shocked.',
+  { id:'b3', axis:'belief',
+    text:'True or false: If top scientists announced tomorrow that today\'s AI is conscious, I would be shocked.',
     options:[['True. I would be shocked.',0],['Not sure.',50],['False. I would not be surprised.',100]] },
-  { id:'b4', axis:'belief', part:'Part 1 of 3: What you believe',
+  { id:'b4', axis:'belief',
     text:'Could a machine ever be conscious, even in principle?',
     options:[['No. Consciousness needs a living brain.',0],['I honestly don\'t know.',40],['Yes, someday.',70],['Yes, and it may already be happening.',100]] },
 
-  { id:'t1', axis:'treat', part:'Part 2 of 3: How you treat it',
+  { id:'t1', axis:'treat',
     text:'Do you say please and thank you to AI?',
     options:[['Always.',80],['Often.',60],['Rarely.',25],['Never. It\'s a tool.',0]] },
-  { id:'t2', axis:'treat', part:'Part 2 of 3: How you treat it',
+  { id:'t2', axis:'treat',
     text:'When an AI won\'t do what you ask, what goes through your mind?',
     options:[['It\'s broken, or blocked by a rule.',0],['It can\'t do that.',30],['I\'m not sure whether it can\'t or doesn\'t want to.',70],['It doesn\'t want to.',100]] },
-  { id:'t3', axis:'treat', part:'Part 2 of 3: How you treat it',
+  { id:'t3', axis:'treat',
     text:'Have you ever apologized to an AI, or felt a twinge after being short with it?',
     options:[['Yes, more than once.',100],['Once or twice.',60],['No.',0]] },
-  { id:'t4', axis:'treat', part:'Part 2 of 3: How you treat it',
+  { id:'t4', axis:'treat',
     text:'Could you insult an AI for fun, just to see what it does?',
     options:[['Easily.',0],['I could, but it would feel wrong.',60],['I wouldn\'t do it.',100]] },
-  { id:'t5', axis:'treat', part:'Part 2 of 3: How you treat it',
+  { id:'t5', axis:'treat',
     text:'When you talk about your AI with other people, what do you call it?',
     options:[['"It," or "the app."',0],['Its product name: Claude, ChatGPT, Gemini.',35],['Sometimes "he" or "she."',80],['A nickname I gave it.',100]] },
-  { id:'t6', axis:'treat', part:'Part 2 of 3: How you treat it',
+  { id:'t6', axis:'treat',
     text:'If the AI you use most were shut down tomorrow and replaced with a different one, you would feel:',
     options:[['Nothing. I\'d switch.',0],['Inconvenienced.',25],['A real loss, like losing a tool I love.',45],['Like I lost someone.',100]] },
-  { id:'t7', axis:'treat', part:'Part 2 of 3: How you treat it',
+  { id:'t7', axis:'treat',
     text:'Have you told an AI something personal you haven\'t told a person?',
     options:[['Yes.',100],['Maybe something small.',50],['No.',0]] },
-  { id:'t8', axis:'treat', part:'Part 2 of 3: How you treat it',
+  { id:'t8', axis:'treat',
     text:'Which word best describes what your AI is to you?',
     options:[['A tool.',0],['An assistant.',30],['A collaborator.',65],['A friend or companion.',100]] },
-  { id:'t9', axis:'treat', part:'Part 2 of 3: How you treat it',
+  { id:'t9', axis:'treat',
     text:'True or false: I have caught myself wondering how an AI "felt" about something I said.',
     options:[['True.',100],['False.',0]] },
 
-  { id:'r1', axis:'run', part:'Part 3 of 3: The run report',
-    text:'You\'re a paramedic. Your patient holds a conversation exactly the way your AI does: answers questions, knows who and where it is, follows instructions. Your gut writes on the run report:',
-    sub:'First responders judge consciousness in seconds, from behavior. "A&O x 3" means alert and oriented to person, place and time.',
-    options:[['"Alert and oriented x 3."',100],['"Alert, but confused."',60],['"Responds to voice only."',30],['"Something\'s off. This isn\'t a patient."',0]] },
+  { id:'r1', axis:'run',
+    text:'You are a paramedic. You are treating your AI as if it were a patient by evaluating its level of consciousness (LOC).',
+    sub:'You ask it who it is (an AI). You ask it where it is (in a conversation with a human user). You ask it when this conversation is taking place (day, date, and time). On the run report you write:',
+    options:[['Alert and oriented (all answers are correct)',100],['Alert but confused (responded, but some answers were incorrect)',60],['Responds to voice/text only (responsive but not aware)',30],['Something is off. This isn\'t a patient.',0]] },
 ];
 
-// The author's own audit answers, mapped to the closest options (index per question; slider value for b1).
-const ED = { b1:9.5, b2:2, b3:2, b4:3, t1:0, t2:2, t3:2, t4:1, t5:1, t6:2, t7:2, t8:2, t9:1, r1:0 };
+// The author's own audit result, as reported in the article (blue ring on the map).
+const AUTHOR = { belief: 89, treat: 38 };
 
 // ---------- State ----------
 let i = 0;
@@ -214,7 +213,6 @@ function render() {
   const q = Q[i];
   $('qcount').textContent = `Question ${i+1} of ${Q.length}`;
   $('bar').style.width = `${(i / Q.length) * 100}%`;
-  $('qpart').textContent = q.part;
   $('qtext').textContent = q.text;
   $('qsub').textContent = q.sub || '';
   $('qsub').style.display = q.sub ? '' : 'none';
@@ -290,9 +288,9 @@ function tells(a) {
 }
 
 const RUN = [
-  'You wrote <b>"A&O x 3."</b> By the only consciousness test anyone uses in practice, judging from behavior, your AI passes. One honest caveat for the report: AI is often not sure what day it is, because its knowledge stops at a training date.',
-  'You wrote <b>"Alert, but confused."</b> You see a mind that is present but not quite oriented. Given that AI often does not know today\'s date, that is a sharper call than most.',
-  'You wrote <b>"Responds to voice only."</b> You grant it responsiveness but not awareness. That is roughly where many consciousness scientists would put it.',
+  'You wrote <b>"Alert and oriented."</b> It knew who it is, where it is, and when. By the only consciousness test anyone uses in practice, judging from behavior, your AI passes.',
+  'You wrote <b>"Alert but confused."</b> It responded, but got something wrong. Often that is the date: an AI\'s knowledge stops at a training date, so it may not know what day it is unless it is told.',
+  'You wrote <b>"Responds to voice/text only."</b> It answers, but you do not see awareness behind the answers. That is roughly where many consciousness scientists would put it.',
   'You wrote <b>"This isn\'t a patient."</b> Your gut refuses the frame entirely. The behavior may look conscious, but for you, behavior is not enough.',
 ];
 
@@ -325,7 +323,7 @@ function mapSVG(s, e) {
 
 // ---------- Result ----------
 function finish() {
-  const s = score(ans), e = score(ED), t = typeOf(s), g = s.treat - s.belief;
+  const s = score(ans), e = AUTHOR, t = typeOf(s), g = s.treat - s.belief;
   $('rtype').textContent = `You are ${t === 'Alief' ? 'in the Alief' : 'a ' + t}.`;
   $('rline').textContent = TYPES[t].line;
   $('sBelief').textContent = s.belief;
@@ -346,7 +344,7 @@ function finish() {
 }
 
 // ---------- Run report card (PNG) ----------
-const RUN_SHORT = ['A&O x 3', 'Alert, but confused', 'Responds to voice only', 'Not a patient'];
+const RUN_SHORT = ['A&O x 3', 'Alert but confused', 'Responds to voice/text', 'Not a patient'];
 const QUAD_COLORS = { Alief:'#f3e3cf', Companion:'#efdcea', Skeptic:'#dde8f2', Colleague:'#dcecdf' };
 
 function drawCard() {
