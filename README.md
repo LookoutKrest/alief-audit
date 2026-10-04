@@ -18,7 +18,7 @@ Standing on a glass floor over the Grand Canyon, you *believe* the glass will ho
 | **Believes it is not conscious** | Skeptic             | Alief                  |
 | **Believes it may be conscious** | Colleague           | Companion              |
 
-- Shows an interpretation of your quadrant and gap, up to three "tells" drawn from specific answers, and your run report verdict. The on-screen map also marks where the article's author landed (belief 89, treatment 38), for comparison.
+- Shows an interpretation of your quadrant and gap, up to three "tells" drawn from specific answers, and your run report verdict. The on-screen map also marks where the article's author landed (belief 89, treatment 42), for comparison.
 - Makes a **run report card**: a one-page PNG with your result, an optional name, and only your own dot. You can download it, copy it, or (on phones and tablets) share it straight to Messages, email and other apps. It is designed for passing around and for group discussions.
 - Works on phones, tablets and computers.
 
@@ -26,7 +26,7 @@ Standing on a glass floor over the Grand Canyon, you *believe* the glass will ho
 
 Everything runs in your browser. No login, no cookies, no analytics. The name on the card never leaves your device.
 
-When results collection is switched on (see below), respondents are offered an opt-in at the end: **"I agree to add my anonymous result."** The page explains that the author plans to compile the results and publish the findings to the public. Only if they click it does the page send their two scores, quadrant, and 14 multiple-choice answers, plus the date. It sends no name, no email, and nothing that identifies the person or device. Google Apps Script does not expose visitors' IP addresses to the script. The browser remembers that it has already submitted, to discourage duplicates.
+When results collection is switched on (see below), respondents are offered an opt-in at the end: **"I agree to add my anonymous result."** The page explains that the author plans to compile the results and publish the findings to the public. Only if they click it does the page send their two scores, quadrant, and 14 multiple-choice answers, plus the date. It sends no name, no email, and nothing that identifies the person or device. Google Apps Script does not expose visitors' IP addresses to the script. An optional one-submission-per-browser check (`ONE_PER_BROWSER` near the top of the script) can discourage duplicates; it is currently switched off, so repeat submissions are possible.
 
 ## Scoring
 
@@ -68,5 +68,6 @@ Choose a license before publishing (MIT is a common choice for small open projec
 
 ## Version history
 
-- **Version 2 (October 3, 2026).** Wording changes after reader testing, because "inner experience" was less familiar to readers than "conscious": question 1 now asks how likely it is that today's AI is conscious, with the subtitle "In other words, do you believe AI is conscious?"; question 3 now asks about scientists announcing that AI "is conscious"; question 14 was rewritten as a paramedic's level-of-consciousness check with clearer answer choices. Part labels were removed from the question screens. Scoring is unchanged. Submissions record `Version` 2, so results can be separated from version 1 test runs.
+- **October 4, 2026 (still version 2).** Submissions are now sent with a browser "beacon," which delivers the data without waiting for Google's reply. Some browsers, Safari in particular, blocked the page from reading that reply, so the page reported "That did not go through" even when the data may have arrived. The one-per-browser check is switched off for testing. The author's comparison ring now sits at belief 89, treatment 42.
+- **Version 2 (October 3, 2026).** Wording changes after reader testing, because "inner experience" was less familiar to readers than "conscious": question 1 now asks how likely it is that today's AI is conscious, with the subtitle "In other words, do you believe AI has internal experiences similar to human consciousness?"; question 3 now asks about scientists announcing that AI "is conscious"; question 14 was rewritten as a paramedic's level-of-consciousness check with clearer answer choices. Part labels were removed from the question screens. Scoring is unchanged. Submissions record `Version` 2, so results can be separated from version 1 test runs.
 - **Version 1 (October 1, 2026).** First release.

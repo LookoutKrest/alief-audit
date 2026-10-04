@@ -147,6 +147,8 @@
 // ---------- Settings ----------
 // Paste the Google Apps Script web app URL here (ends in /exec). Leave empty to hide the opt-in.
 const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbwAHsl0LFLHZj___Herl05Umz_pquZ1McqkotAz0o9oc1F-3r1l2iAoP8ky5jGyOGY6/exec';
+// One submission per browser. Set to true to discourage repeat submissions again.
+const ONE_PER_BROWSER = false;
 const VERSION = 2; // 2 = Oct 3, 2026 wording (Q1 subtitle, Q3, run report)
 
 // ---------- Questions ----------
@@ -154,7 +156,7 @@ const VERSION = 2; // 2 = Oct 3, 2026 wording (Q1 subtitle, Q3, run report)
 const Q = [
   { id:'b1', axis:'belief', type:'slider',
     text:'Gut answer: how likely is it that today\'s AI is conscious?',
-    sub:'In other words, do you believe AI is conscious? 0 means no chance. 10 means certain.' },
+    sub:'In other words, do you believe AI has internal experiences similar to human consciousness? 0 means no chance. 10 means you are certain that it does.' },
   { id:'b2', axis:'belief',
     text:'Which comes closest to what you think is going on inside a chatbot like ChatGPT, Claude or Gemini?',
     options:[['Nothing. It is very sophisticated autocomplete.',0],['Probably nothing, but I can\'t rule it out.',33],['Something, but very different from a human mind.',67],['A mind, much like ours.',100]] },
@@ -200,7 +202,7 @@ const Q = [
 ];
 
 // The author's own audit result, as reported in the article (blue ring on the map).
-const AUTHOR = { belief: 89, treat: 38 };
+const AUTHOR = { belief: 89, treat: 42 };
 
 // ---------- State ----------
 let i = 0;
@@ -429,7 +431,7 @@ function wrapText(c, text, x, y, maxW, lh, font, color) {
 }
 
 // ---------- Opt-in submission ----------
-function alreadySent() { try { return localStorage.getItem('aliefAuditSent') === '1'; } catch { return false; } }
+function alreadySent() { if (!ONE_PER_BROWSER) return false; try { return localStorage.getItem('aliefAuditSent') === '1'; } catch { return false; } }
 function markSent() { try { localStorage.setItem('aliefAuditSent', '1'); } catch {} }
 
 function setupOptin() {
@@ -448,12 +450,15 @@ async function submitResult() {
   $('submitBtn').disabled = true;
   $('submitMsg').textContent = 'Sending…';
   try {
-    // text/plain keeps this a "simple" request, which Google Apps Script accepts without a CORS preflight.
-    const r = await fetch(SUBMIT_URL, { method: 'POST', body: JSON.stringify(payload) });
-    const j = await r.json();
-    if (!j.ok) throw new Error(j.error || 'rejected');
+    // Google Apps Script runs doPost as soon as the request arrives, then replies with a redirect that
+    // some browsers (Safari in particular) will not let the page read. A beacon hands the data to the
+    // browser to deliver and does not wait for that reply, so a blocked reply cannot look like a failure.
+    const body = JSON.stringify(payload);
+    const queued = navigator.sendBeacon && navigator.sendBeacon(SUBMIT_URL, new Blob([body], { type: 'text/plain' }));
+    if (!queued) await fetch(SUBMIT_URL, { method: 'POST', mode: 'no-cors', body });
     markSent();
-    $('submitMsg').textContent = 'Added. Thank you for being part of the count.';
+    $('submitBtn').disabled = true;
+    $('submitMsg').textContent = 'Sent. Thank you for being part of the count.';
   } catch (e) {
     $('submitBtn').disabled = false;
     $('submitMsg').textContent = 'That did not go through. Please try again in a moment.';
